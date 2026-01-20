@@ -243,19 +243,61 @@
     }
 
     // ========================================
-    // BACKGROUND MUSIC PLAYER
+    // BACKGROUND MUSIC PLAYER WITH CROSS-PAGE PERSISTENCE
     // ========================================
 
     const musicPlayer = $('#musicPlayer');
     const bgMusic = $('#bgMusic')[0];
     let isPlaying = false;
 
+    // Initialize music player with saved state
+    function initMusicPlayer() {
+        if (!bgMusic) return;
+
+        // Check if music was playing on previous page
+        const savedState = sessionStorage.getItem('musicPlaying');
+        const savedTime = parseFloat(sessionStorage.getItem('musicTime')) || 0;
+
+        // Set the saved playback position
+        bgMusic.currentTime = savedTime;
+
+        // If music was playing, resume playback
+        if (savedState === 'true') {
+            bgMusic.play().then(function() {
+                musicPlayer.find('.music-icon').html('<i class="fas fa-pause"></i>');
+                musicPlayer.addClass('playing');
+                isPlaying = true;
+            }).catch(function(error) {
+                console.log('Auto-resume blocked by browser:', error);
+                // Browser blocked autoplay, show play button
+                musicPlayer.find('.music-icon').html('<i class="fas fa-music"></i>');
+                musicPlayer.removeClass('playing');
+                isPlaying = false;
+            });
+        }
+
+        // Save playback position periodically
+        setInterval(function() {
+            if (isPlaying && bgMusic) {
+                sessionStorage.setItem('musicTime', bgMusic.currentTime);
+            }
+        }, 500);
+
+        // Save state before page unload
+        window.addEventListener('beforeunload', function() {
+            sessionStorage.setItem('musicPlaying', isPlaying);
+            sessionStorage.setItem('musicTime', bgMusic.currentTime);
+        });
+    }
+
+    // Toggle music play/pause
     musicPlayer.on('click', function() {
         if (isPlaying) {
             bgMusic.pause();
             $(this).find('.music-icon').html('<i class="fas fa-music"></i>');
             $(this).removeClass('playing');
             isPlaying = false;
+            sessionStorage.setItem('musicPlaying', 'false');
         } else {
             bgMusic.play().catch(function(error) {
                 console.log('Audio playback failed:', error);
@@ -263,8 +305,12 @@
             $(this).find('.music-icon').html('<i class="fas fa-pause"></i>');
             $(this).addClass('playing');
             isPlaying = true;
+            sessionStorage.setItem('musicPlaying', 'true');
         }
     });
+
+    // Initialize music player
+    initMusicPlayer();
 
     // ========================================
     // SMOOTH REVEAL FOR SECTION HEADERS
