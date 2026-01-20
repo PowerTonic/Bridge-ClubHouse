@@ -67,29 +67,32 @@
             <div class="split-section fade-in">
                 <div class="split-content">
                     <h3>VISIT US</h3>
-                    <p style="margin-bottom: 2rem;">Experience luxury firsthand at The Bridge Clubhouse. We're conveniently located on Bridge Street in the heart of Jinja, overlooking the magnificent River Nile.</p>
+                    <p class="contact-intro">Experience luxury firsthand at The Bridge Clubhouse. We're conveniently located on Bridge Street in the heart of Jinja, overlooking the magnificent River Nile.</p>
 
-                    <div style="margin-bottom: 2rem;">
-                        <h4 style="color: #c9a961; margin-bottom: 1rem;"><i class="fas fa-map-marker-alt"></i> LOCATION</h4>
-                        <p>Bridge Street, Jinja, Uganda<br>East Africa</p>
-                    </div>
+                    <div class="contact-info-grid">
+                        <div class="contact-info-card">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <h4>LOCATION</h4>
+                            <p>Bridge Street, Jinja<br>Uganda, East Africa</p>
+                        </div>
 
-                    <div style="margin-bottom: 2rem;">
-                        <h4 style="color: #c9a961; margin-bottom: 1rem;"><i class="fas fa-phone"></i> PHONE</h4>
-                        <p>+256 (0) 200 923 235</p>
-                    </div>
+                        <div class="contact-info-card">
+                            <i class="fas fa-phone"></i>
+                            <h4>PHONE</h4>
+                            <p>+256 (0) 200 923 235</p>
+                        </div>
 
-                    <div style="margin-bottom: 2rem;">
-                        <h4 style="color: #c9a961; margin-bottom: 1rem;"><i class="fas fa-envelope"></i> EMAIL</h4>
-                        <p>info@thebridgejinja.club</p>
-                    </div>
+                        <div class="contact-info-card">
+                            <i class="fas fa-envelope"></i>
+                            <h4>EMAIL</h4>
+                            <p>info@thebridgejinja.club</p>
+                        </div>
 
-                    <div>
-                        <h4 style="color: #c9a961; margin-bottom: 1rem;"><i class="fas fa-clock"></i> HOURS</h4>
-                        <p>Monday - Sunday: 6:00 AM - 11:00 PM<br>
-                        Restaurant: 7:00 AM - 10:00 PM<br>
-                        Gym: 5:00 AM - 10:00 PM<br>
-                        Spa: 9:00 AM - 9:00 PM</p>
+                        <div class="contact-info-card">
+                            <i class="fas fa-clock"></i>
+                            <h4>HOURS</h4>
+                            <p>Daily: 6AM - 11PM<br>Restaurant: 7AM - 10PM</p>
+                        </div>
                     </div>
                 </div>
                 <div class="split-image">
@@ -107,44 +110,58 @@
                 <p class="section-subtitle">Fill Out the Form Below and We'll Get Back to You Soon</p>
             </div>
 
-            <div style="max-width: 800px; margin: 0 auto;">
-                <form class="contact-form fade-in" style="background: rgba(255,255,255,0.05); padding: 3rem; border-radius: 8px;">
-                    <div style="margin-bottom: 1.5rem;">
-                        <label style="display: block; margin-bottom: 0.5rem; color: #c9a961; font-weight: 500;">Full Name *</label>
-                        <input type="text" name="name" required style="width: 100%; padding: 1rem; border: 1px solid rgba(201, 169, 97, 0.3); background: rgba(255,255,255,0.05); color: #fff; border-radius: 4px; font-size: 1rem;">
+            <div class="contact-form-wrapper">
+                <form class="contact-form fade-in">
+                    <!-- Name and Email Row -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">Full Name <span class="required">*</span></label>
+                            <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email Address <span class="required">*</span></label>
+                            <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+                        </div>
                     </div>
 
-                    <div style="margin-bottom: 1.5rem;">
-                        <label style="display: block; margin-bottom: 0.5rem; color: #c9a961; font-weight: 500;">Email Address *</label>
-                        <input type="email" name="email" required style="width: 100%; padding: 1rem; border: 1px solid rgba(201, 169, 97, 0.3); background: rgba(255,255,255,0.05); color: #fff; border-radius: 4px; font-size: 1rem;">
+                    <!-- Phone and Subject Row -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" placeholder="Enter your phone number">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subject">Subject <span class="required">*</span></label>
+                            <select id="subject" name="subject" required>
+                                <option value="">Select a subject</option>
+                                <option value="membership">Membership Inquiry</option>
+                                <option value="restaurant">Restaurant Reservation</option>
+                                <option value="spa">Spa Appointment</option>
+                                <option value="gym">Gym Membership</option>
+                                <option value="events">Private Events</option>
+                                <option value="general">General Inquiry</option>
+                                <option value="feedback">Feedback</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <div style="margin-bottom: 1.5rem;">
-                        <label style="display: block; margin-bottom: 0.5rem; color: #c9a961; font-weight: 500;">Phone Number</label>
-                        <input type="tel" name="phone" style="width: 100%; padding: 1rem; border: 1px solid rgba(201, 169, 97, 0.3); background: rgba(255,255,255,0.05); color: #fff; border-radius: 4px; font-size: 1rem;">
+                    <!-- Message -->
+                    <div class="form-group">
+                        <label for="message">Your Message <span class="required">*</span></label>
+                        <textarea id="message" name="message" rows="6" placeholder="How can we assist you today?" required></textarea>
                     </div>
 
-                    <div style="margin-bottom: 1.5rem;">
-                        <label style="display: block; margin-bottom: 0.5rem; color: #c9a961; font-weight: 500;">Subject *</label>
-                        <select name="subject" required style="width: 100%; padding: 1rem; border: 1px solid rgba(201, 169, 97, 0.3); background: rgba(255,255,255,0.05); color: #fff; border-radius: 4px; font-size: 1rem;">
-                            <option value="">Select a subject</option>
-                            <option value="membership">Membership Inquiry</option>
-                            <option value="restaurant">Restaurant Reservation</option>
-                            <option value="spa">Spa Appointment</option>
-                            <option value="gym">Gym Membership</option>
-                            <option value="events">Private Events</option>
-                            <option value="general">General Inquiry</option>
-                            <option value="feedback">Feedback</option>
-                        </select>
+                    <!-- Submit Button -->
+                    <div class="form-submit">
+                        <button type="submit" class="btn-submit">Send Message</button>
                     </div>
 
-                    <div style="margin-bottom: 2rem;">
-                        <label style="display: block; margin-bottom: 0.5rem; color: #c9a961; font-weight: 500;">Message *</label>
-                        <textarea name="message" rows="6" required style="width: 100%; padding: 1rem; border: 1px solid rgba(201, 169, 97, 0.3); background: rgba(255,255,255,0.05); color: #fff; border-radius: 4px; font-size: 1rem; resize: vertical;"></textarea>
-                    </div>
-
-                    <div style="text-align: center;">
-                        <button type="submit" class="btn btn-primary" style="min-width: 200px;">SEND MESSAGE</button>
+                    <!-- Success Message -->
+                    <div class="form-success" id="formSuccess">
+                        <i class="fas fa-check-circle"></i>
+                        <p>Thank you for your message. We'll get back to you soon.</p>
                     </div>
                 </form>
             </div>
