@@ -244,68 +244,172 @@
 
     // ========================================
     // BACKGROUND MUSIC PLAYER WITH CROSS-PAGE PERSISTENCE
+    // Multi-browser support (Chrome, Firefox, Safari, Edge)
     // ========================================
 
     const musicPlayer = $('#musicPlayer');
     const bgMusic = $('#bgMusic')[0];
     let isPlaying = false;
+    let pendingResume = false;
+    let audioReady = false;
 
     // Initialize music player with saved state
     function initMusicPlayer() {
-        if (!bgMusic) return;
+        if (!bgMusic || !musicPlayer.length) return;
 
-        // Check if music was playing on previous page
         const savedState = sessionStorage.getItem('musicPlaying');
         const savedTime = parseFloat(sessionStorage.getItem('musicTime')) || 0;
 
-        // Set the saved playback position
-        bgMusic.currentTime = savedTime;
+        // Wait for audio to be ready before setting time
+        function onAudioReady() {
+            audioReady = true;
 
-        // If music was playing, resume playback
-        if (savedState === 'true') {
-            bgMusic.play().then(function() {
-                musicPlayer.find('.music-icon').html('<i class="fas fa-pause"></i>');
-                musicPlayer.addClass('playing');
-                isPlaying = true;
-            }).catch(function(error) {
-                console.log('Auto-resume blocked by browser:', error);
-                // Browser blocked autoplay, show play button
-                musicPlayer.find('.music-icon').html('<i class="fas fa-music"></i>');
-                musicPlayer.removeClass('playing');
-                isPlaying = false;
+            // Safely set playback position
+            try {
+                if (savedTime > 0 && savedTime < bgMusic.duration) {
+                    bgMusic.currentTime = savedTime;
+                }
+            } catch (e) {
+                console.log('Could not set audio time:', e);
+            }
+
+            // Try to resume if was playing
+            if (savedState === 'true') {
+                attemptAutoResume();
+            }
+        }
+
+        // Handle different audio ready states across browsers
+        if (bgMusic.readyState >= 3) {
+            // Audio already loaded (cached)
+            onAudioReady();
+        } else {
+            // Wait for audio to load
+            bgMusic.addEventListener('canplaythrough', onAudioReady, { once: true });
+            bgMusic.addEventListener('loadeddata', function() {
+                // Fallback for some browsers
+                if (!audioReady) onAudioReady();
+            }, { once: true });
+        }
+
+        // Attempt auto-resume with browser policy handling
+        function attemptAutoResume() {
+            const playPromise = bgMusic.play();
+
+            if (playPromise !== undefined) {
+                playPromise.then(function() {
+                    // Autoplay succeeded
+                    updatePlayerUI(true);
+                    isPlaying = true;
+                    pendingResume = false;
+                }).catch(function(error) {
+                    // Autoplay blocked - set pending state
+                    console.log('Autoplay blocked:', error.name);
+                    pendingResume = true;
+                    updatePlayerUI(false);
+
+                    // Show pulse animation to indicate music wants to resume
+                    musicPlayer.addClass('pending-resume');
+
+                    // Listen for user interaction to resume
+                    setupInteractionResume();
+                });
+            }
+        }
+
+        // Resume on first user interaction (for strict browsers)
+        function setupInteractionResume() {
+            const resumeEvents = ['click', 'touchstart', 'keydown'];
+
+            function handleInteraction(e) {
+                if (pendingResume && savedState === 'true') {
+                    bgMusic.play().then(function() {
+                        updatePlayerUI(true);
+                        isPlaying = true;
+                        pendingResume = false;
+                        musicPlayer.removeClass('pending-resume');
+                    }).catch(function() {
+                        // Still blocked, user must click player directly
+                    });
+
+                    // Remove listeners after first interaction
+                    resumeEvents.forEach(function(event) {
+                        document.removeEventListener(event, handleInteraction);
+                    });
+                }
+            }
+
+            resumeEvents.forEach(function(event) {
+                document.addEventListener(event, handleInteraction, { once: true, passive: true });
             });
         }
 
+        // Update player UI
+        function updatePlayerUI(playing) {
+            if (playing) {
+                musicPlayer.find('.music-icon').html('<i class="fas fa-pause"></i>');
+                musicPlayer.addClass('playing');
+            } else {
+                musicPlayer.find('.music-icon').html('<i class="fas fa-music"></i>');
+                musicPlayer.removeClass('playing');
+            }
+        }
+
         // Save playback position periodically
-        setInterval(function() {
-            if (isPlaying && bgMusic) {
-                sessionStorage.setItem('musicTime', bgMusic.currentTime);
+        let saveInterval = setInterval(function() {
+            if (isPlaying && bgMusic && !isNaN(bgMusic.currentTime)) {
+                sessionStorage.setItem('musicTime', bgMusic.currentTime.toString());
             }
         }, 500);
 
-        // Save state before page unload
-        window.addEventListener('beforeunload', function() {
-            sessionStorage.setItem('musicPlaying', isPlaying);
-            sessionStorage.setItem('musicTime', bgMusic.currentTime);
+        // Handle audio events for accurate state tracking
+        bgMusic.addEventListener('play', function() {
+            isPlaying = true;
+            updatePlayerUI(true);
+            sessionStorage.setItem('musicPlaying', 'true');
+        });
+
+        bgMusic.addEventListener('pause', function() {
+            isPlaying = false;
+            updatePlayerUI(false);
+            sessionStorage.setItem('musicPlaying', 'false');
+        });
+
+        bgMusic.addEventListener('ended', function() {
+            // Loop is handled by HTML attribute, but save state
+            sessionStorage.setItem('musicTime', '0');
+        });
+
+        // Save state before page unload (works across browsers)
+        function saveState() {
+            if (bgMusic && !isNaN(bgMusic.currentTime)) {
+                sessionStorage.setItem('musicPlaying', isPlaying.toString());
+                sessionStorage.setItem('musicTime', bgMusic.currentTime.toString());
+            }
+        }
+
+        window.addEventListener('beforeunload', saveState);
+        window.addEventListener('pagehide', saveState); // For Safari/iOS
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'hidden') {
+                saveState();
+            }
         });
     }
 
-    // Toggle music play/pause
+    // Toggle music play/pause on click
     musicPlayer.on('click', function() {
+        if (!bgMusic) return;
+
+        pendingResume = false;
+        musicPlayer.removeClass('pending-resume');
+
         if (isPlaying) {
             bgMusic.pause();
-            $(this).find('.music-icon').html('<i class="fas fa-music"></i>');
-            $(this).removeClass('playing');
-            isPlaying = false;
-            sessionStorage.setItem('musicPlaying', 'false');
         } else {
             bgMusic.play().catch(function(error) {
-                console.log('Audio playback failed:', error);
+                console.log('Playback failed:', error);
             });
-            $(this).find('.music-icon').html('<i class="fas fa-pause"></i>');
-            $(this).addClass('playing');
-            isPlaying = true;
-            sessionStorage.setItem('musicPlaying', 'true');
         }
     });
 

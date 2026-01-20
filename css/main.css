@@ -1174,6 +1174,22 @@ p {
     animation: goldGlow 2s ease-in-out infinite;
 }
 
+/* Pending resume state - pulses to indicate music wants to play */
+.music-player.pending-resume {
+    animation: pendingPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pendingPulse {
+    0%, 100% {
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4),
+                    0 0 0 0 rgba(201, 169, 97, 0.4);
+    }
+    50% {
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4),
+                    0 0 0 8px rgba(201, 169, 97, 0);
+    }
+}
+
 .music-icon {
     width: 40px;
     height: 40px;
